@@ -1,7 +1,11 @@
 import {
   Component,
   Input,
-  Attribute
+  Attribute,
+  DynamicComponentLoader,
+  Injector,
+  ElementRef,
+  ViewContainerRef
 } from '@angular/core';
 import {
   Routes,
@@ -49,6 +53,18 @@ export class Linker {
 }
 
 @Component({
+             selector: 'form',
+             template: `<form>
+                         <input type="text" name="yo" />
+                         <input type="button" value="ok" />
+                        </form>`
+           })
+export class Form {
+
+}
+
+
+@Component({
   selector: 'hello-app',
   viewProviders: [Greeter],
   directives: [ROUTER_DIRECTIVES, Linker],
@@ -59,6 +75,11 @@ export class Linker {
     </ul>
     <router-outlet></router-outlet>
     <linker name="GitHub" url="https://github.com/shuhei/babel-angular2-app"></linker>
+
+    <button (click)="onClick()">View Form</button>
+   <button (click)="onDynClick()">Load Dynamically</button>
+    <div #form>Welcome..! Here form component will be loaded.</div>
+    <div id="form">Form will be loaded above this.</div>
   `
 })
 @Routes([
@@ -66,4 +87,24 @@ export class Linker {
   new Route({ path: '/ciao/:name', component: Ciao })
 ])
 export class HelloApp {
+
+  constructor(dcl: DynamicComponentLoader, injector: Injector, viewContainerRef: ViewContainerRef) {
+    this.dcl = dcl;
+    this.injector = injector;
+    this.viewContainerRef = viewContainerRef;
+  }
+  onClick() {
+    if(this.component != undefined){
+      this.component.then((componentRef: ComponentRef) => {
+        componentRef.dispose();
+        return componentRef;
+      });
+    }
+    this.component = this.dcl.loadNextToLocation(Form, this.viewContainerRef);
+    alert('form');
+  }
+  onDynClick() {
+    document.getElementById('form').innerHTML = '<div id="inj"></div>';
+    this.dcl.loadAsRoot(Form, "#inj",this.injector);
+  }
 }
