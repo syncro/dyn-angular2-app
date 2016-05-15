@@ -14,6 +14,9 @@ import {
   ROUTER_DIRECTIVES
 } from '@angular/router';
 
+import {MdCheckbox} from '@angular2-material/checkbox';
+
+
 import {Greeter} from './services';
 
 @Component({
@@ -67,7 +70,7 @@ export class Form {
 @Component({
   selector: 'hello-app',
   viewProviders: [Greeter],
-  directives: [ROUTER_DIRECTIVES, Linker],
+  directives: [ROUTER_DIRECTIVES, Linker, MdCheckbox],
   template: `
     <ul>
       <li><a [routerLink]="['/']">Hello</a></li>
@@ -77,22 +80,36 @@ export class Form {
     <linker name="GitHub" url="https://github.com/shuhei/babel-angular2-app"></linker>
 
     <button (click)="onClick()">View Form</button>
-   <button (click)="onDynClick()">Load Dynamically</button>
+    <button (click)="onDynClick()">Load Dynamically</button>
     <div #form>Welcome..! Here form component will be loaded.</div>
     <div id="form">Form will be loaded above this.</div>
+    <md-checkbox>checkbox</md-checkbox>
   `
 })
 @Routes([
   new Route({ path: '/', component: Hello }),
   new Route({ path: '/ciao/:name', component: Ciao })
 ])
-export class HelloApp {
+export class App {
 
   constructor(dcl: DynamicComponentLoader, injector: Injector, viewContainerRef: ViewContainerRef) {
     this.dcl = dcl;
     this.injector = injector;
     this.viewContainerRef = viewContainerRef;
   }
+
+  ngOnInit() {
+    this.bindComponentAddEvent();
+  }
+
+  bindComponentAddEvent() {
+    window.addEventListener('component:add', function (e) {
+      var cmp = e.detail.component;
+      var sl = e.detail.selector;
+      this.dcl.loadAsRoot(cmp, sl,this.injector);
+    }.bind(this), false);
+  }
+
   onClick() {
     if(this.component != undefined){
       this.component.then((componentRef: ComponentRef) => {
@@ -103,8 +120,14 @@ export class HelloApp {
     this.component = this.dcl.loadNextToLocation(Form, this.viewContainerRef);
     alert('form');
   }
+
   onDynClick() {
+
     document.getElementById('form').innerHTML = '<div id="inj"></div>';
-    this.dcl.loadAsRoot(Form, "#inj",this.injector);
+
+    window.dispatchEvent(new CustomEvent(
+        'component:add',
+        {'detail': {'component': Form, 'selector': '#inj' }}
+    ));
   }
 }

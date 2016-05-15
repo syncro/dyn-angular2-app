@@ -6,9 +6,9 @@ import {bootstrap} from '@angular/platform-browser-dynamic';
 import {ROUTER_PROVIDERS} from '@angular/router';
 import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 
-import {HelloApp} from './app';
+import {App} from './app';
 
-bootstrap(HelloApp, [
+bootstrap(App, [
   ROUTER_PROVIDERS,
   provide(LocationStrategy, { useClass: HashLocationStrategy })
 ]).catch(err => console.error(err));
