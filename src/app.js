@@ -15,7 +15,7 @@ import {
 } from '@angular/router';
 
 import {MdCheckbox} from '@angular2-material/checkbox';
-
+import {MdButton} from '@angular2-material/button';
 
 import {Greeter} from './services';
 
@@ -70,7 +70,7 @@ export class Form {
 @Component({
   selector: 'hello-app',
   viewProviders: [Greeter],
-  directives: [ROUTER_DIRECTIVES, Linker, MdCheckbox],
+  directives: [ROUTER_DIRECTIVES, Linker, MdCheckbox, MdButton],
   template: `
     <ul>
       <li><a [routerLink]="['/']">Hello</a></li>
@@ -83,7 +83,8 @@ export class Form {
     <button (click)="onDynClick()">Load Dynamically</button>
     <div #form>Welcome..! Here form component will be loaded.</div>
     <div id="form">Form will be loaded above this.</div>
-    <md-checkbox>checkbox</md-checkbox>
+    <md-checkbox [color]="primary">checkbox</md-checkbox>
+    <button md-button>yo</button>
   `
 })
 @Routes([
